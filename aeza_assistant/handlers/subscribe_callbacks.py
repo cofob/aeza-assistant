@@ -9,6 +9,7 @@ from ..models.chat import ChatModel
 from ..texts import Texts
 from ..utils import is_user_admin
 from .router import router
+from .start import Keyboard
 
 log = getLogger(__name__)
 
@@ -30,6 +31,9 @@ async def subscribe(
     chat_model.is_subscribed = True
     await chat_model.save(db)
     await callback_query.answer(Texts.subscribed)
+    await callback_query.message.edit_text(
+        Texts.start_subscribed, reply_markup=Keyboard.unsubscribe
+    )
 
 
 @router.callback_query(SubscribeCallback.filter(F.action == False))
@@ -49,3 +53,4 @@ async def unsubscribe(
     chat_model.is_subscribed = False
     await chat_model.save(db)
     await callback_query.answer(Texts.unsubscribed)
+    await callback_query.message.edit_text(Texts.start, reply_markup=Keyboard.subscribe)

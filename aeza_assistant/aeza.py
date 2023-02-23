@@ -25,11 +25,11 @@ class Aeza:
     async def get_product_group_statuses(self) -> dict[int, bool]:
         out = {}
         resp = await self._request("GET", "services/products")
-        print(dumps(resp))
         for group in resp["data"]["items"]:
-            _id = group["id"]
-            if group["group"]["payload"].get("isDisabled") is None:
-                out[_id] = False
-            else:
-                print(group["group"]["payload"]["isDisabled"])
+            try:
+                id_ = group["id"]
+                status = group["group"]["payload"]["isDisabled"] == "true"
+                out[id_] = False if status else True
+            except (KeyError, TypeError):
+                pass
         return out

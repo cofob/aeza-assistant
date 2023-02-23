@@ -4,8 +4,9 @@ from __future__ import annotations
 import typing as t
 
 from pydantic import BaseModel
-from sqlalchemy import Column, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from ..database import Base
 
@@ -79,7 +80,7 @@ class AbstractModel(Base):
         return (await db.execute(query)).scalars().first()
 
     @staticmethod
-    def _get_column(model: t.Type[T], column: Column[t.Any]) -> str:
+    def _get_column(model: t.Type[T], column: InstrumentedAttribute[t.Any]) -> str:
         """Get a column name."""
         name = column.name
         if name not in model.__table__.columns:  # type: ignore
@@ -88,7 +89,10 @@ class AbstractModel(Base):
 
     @classmethod
     async def get_by_key(
-        cls: t.Type[T], db: AsyncSession, key: Column[t.Any], value: t.Any
+        cls: t.Type[T],
+        db: AsyncSession,
+        key: InstrumentedAttribute[t.Any],
+        value: t.Any,
     ) -> T | None:
         """Get a model by a key."""
         query = select(cls).filter_by(**{cls._get_column(cls, key): value})
@@ -98,7 +102,7 @@ class AbstractModel(Base):
     async def get_list_by_key(
         cls: t.Type[T],
         db: AsyncSession,
-        key: Column[t.Any],
+        key: InstrumentedAttribute[t.Any],
         value: t.Any,
         limit: int = 10,
         offset: int = 0,
