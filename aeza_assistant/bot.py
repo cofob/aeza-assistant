@@ -29,6 +29,7 @@ class BotFabric:
         self,
         token: str,
         database_url: str,
+        push_addresses: str = "",
         session: ClientSession = ClientSession(),
         storage: BaseStorage = MemoryStorage(),
     ) -> None:
@@ -53,6 +54,8 @@ class BotFabric:
             api=self.aeza,
             bot_state=self.state,
             queue=self.queue,
+            push_addresses=self._parse_push_addresses(push_addresses),
+            session=self.session,
         )
 
         # Create dispatcher
@@ -68,6 +71,22 @@ class BotFabric:
         dispatcher.include_router(router.router)
 
         self.dispatcher = dispatcher
+
+    @staticmethod
+    def _parse_push_addresses(inp: str) -> dict[str, str]:
+        """Parse push addresses."""
+        inp = inp.strip()
+        if not inp:
+            return {}
+        # Format: "name1|address1,name2|address2"
+        out = {}
+        spl1 = inp.split(",")
+        for item in spl1:
+            spl2 = item.split("|")
+            if len(spl2) != 2:
+                raise ValueError("Invalid format")
+            out[spl2[0].strip()] = spl2[1].strip()
+        return out
 
     async def run(self) -> None:
         create_task(self.cron.run())

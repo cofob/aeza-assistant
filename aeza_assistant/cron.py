@@ -1,10 +1,11 @@
 """Cron jobs for the bot."""
 
-from asyncio import Queue, sleep
+from asyncio import Queue, create_task, sleep
 from logging import getLogger
 from time import time
 
 from aiogram import Bot
+from aiohttp import ClientSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -24,16 +25,20 @@ class Cron:
         api: Aeza,
         bot_state: BotState,
         queue: Queue,
+        session: ClientSession,
+        push_addresses: dict[str, str] = {},
     ) -> None:
         self.bot = bot
         self.maker = maker
-        self.interval = 60
+        self.interval = 50
         self.notify_sleep = 60 * 30
         self.api = api
         self.queue = queue
         self.bot_state = bot_state
         self.prev_statuses: dict[str, tuple[bool, float]] = {}
         self.notified_statuses: dict[str, bool] = {}
+        self.push_addresses = push_addresses
+        self.session = session
 
     async def run(self) -> None:
         while True:
@@ -54,6 +59,14 @@ class Cron:
                     f"Тарифная группа {name} теперь {'включена' if status else 'выключена'}.",
                 )
             )
+
+    async def send_push(self, url: str) -> None:
+        async with self.session.get(url) as resp:
+            log.debug(f"Push notification for {url} sent")
+            if resp.status != 200:
+                log.error(
+                    f"Push notification for {url} failed with {resp.status}: {await resp.text()}"
+                )
 
     async def job(self, session: AsyncSession) -> None:
         statuses = await self.api.get_product_group_statuses()
@@ -101,6 +114,10 @@ class Cron:
                 )
                 self.prev_statuses[name] = curr_statuses[name]
                 changed_statuses.append(name)
+
+        for name in self.prev_statuses:
+            if name in self.push_addresses and self.prev_statuses[name][0]:
+                create_task(self.send_push(self.push_addresses[name]))
 
         for name in self.prev_statuses:
             status, last_change = self.prev_statuses[name]

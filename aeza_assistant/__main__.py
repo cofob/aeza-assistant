@@ -1,6 +1,7 @@
 """Main entry point for the bot."""
 
 from asyncio import get_event_loop, run
+from json import loads
 from logging import basicConfig
 from os import environ
 from sys import argv, exit
@@ -21,7 +22,9 @@ def get_env(name: str) -> str:
 
 async def main_async() -> None:
     """Run the bot."""
-    basicConfig(level=environ.get("LOG_LEVEL", "INFO").upper(), filename=environ.get("LOG_FILE"))
+    basicConfig(
+        level=environ.get("LOG_LEVEL", "INFO").upper(), filename=environ.get("LOG_FILE")
+    )
     if len(argv) < 2:
         print("Usage: python -m bot [run]")
         exit(1)
@@ -30,6 +33,7 @@ async def main_async() -> None:
         bot = BotFabric(
             token=get_env("TOKEN"),
             database_url=get_env("DATABASE_URL"),
+            push_addresses=environ.get("PUSH_ADDRESSES", ""),
             session=session,
         )
 
