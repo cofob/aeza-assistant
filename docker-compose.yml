@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+
+    restart: always
+
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+      POSTGRES_PASSWORD: password
+
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  bot:
+    image: ghcr.io/cofob/aeza-assisstant:latest
+
+    restart: always
+
+    environment:
+      TOKEN: "1234567890:ABCDEF1234567890ABCDEF1234567890ABC"
+      DATABASE_URL: "postgresql+asyncpg://user:password@localhost/db"
+
+    depends_on:
+      - db

@@ -21,7 +21,7 @@ def get_env(name: str) -> str:
 
 async def main_async() -> None:
     """Run the bot."""
-    basicConfig(level=environ.get("LOG_LEVEL", "INFO").upper(), filename="bot.log")
+    basicConfig(level=environ.get("LOG_LEVEL", "INFO").upper(), filename=environ.get("LOG_FILE"))
     if len(argv) < 2:
         print("Usage: python -m bot [run]")
         exit(1)
