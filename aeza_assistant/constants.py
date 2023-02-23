@@ -1,0 +1,15 @@
+TARIFF_GROUPS = {
+    "AMS-PROMO": 31,
+    "VIEs": 329,
+    "VIE": 102,
+    "DEs": 220,
+    "DE": 166,
+    "NLs": 197,
+    "NL": 24,
+    "SWEs": 9,
+    "SWE": 14,
+    "HELs": 116,
+    "HEL": 335,
+    "EP": 205,
+    "EPs": 22,
+}
