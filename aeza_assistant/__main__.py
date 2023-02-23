@@ -1,10 +1,11 @@
 """Main entry point for the bot."""
 
+from asyncio import get_event_loop, run
 from logging import basicConfig
 from os import environ
 from sys import argv, exit
+
 from aiohttp import ClientSession
-from asyncio import run, get_event_loop
 
 from .bot import BotFabric
 
@@ -28,8 +29,7 @@ async def main_async() -> None:
     async with ClientSession() as session:
         bot = BotFabric(
             token=get_env("TOKEN"),
-            aeza_token=get_env("AEZA_TOKEN"),
-            data_dir=environ.get("DATA_DIR", "data"),
+            database_url=get_env("DATABASE_URL"),
             session=session,
         )
 

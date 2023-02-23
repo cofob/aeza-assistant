@@ -14,6 +14,10 @@ aeza-assistant = "aeza_assistant.__main__:main"
 python = "^3.11"
 aiogram = "^3.0.0b7"
 aiohttp = "^3.8.4"
+sqlalchemy = "^2"
+asyncpg = "^0.27.0"
+alembic = "^1.9.4"
+python-dateutil = "^2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

@@ -1,21 +1,20 @@
 """Bot fabric."""
 
+from asyncio import create_task, run
 from logging import getLogger
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.base import BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiohttp import ClientSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
-from asyncio import run, create_task
-
-from pathlib import Path
-
-from .handlers import router
-from .middlewares import ArgsMiddleware, ErrorHandlerMiddleware
-from .db import ChatManager
-from .cron import Cron
 from .aeza import Aeza
+from .cron import Cron
+from .handlers import router
+from .middlewares import (ChatModelMiddleware, DatabaseMiddleware,
+                          ErrorHandlerMiddleware)
 
 log = getLogger(__name__)
 
@@ -26,33 +25,31 @@ class BotFabric:
     def __init__(
         self,
         token: str,
-        aeza_token: str,
-        data_dir: str,
-        session: ClientSession,
+        database_url: str,
+        session: ClientSession = ClientSession(),
         storage: BaseStorage = MemoryStorage(),
     ) -> None:
         """Initialize bot fabric."""
+        self.engine = create_async_engine(
+            database_url, future=True, pool_size=50, max_overflow=100
+        )
+        self.sessionmaker = sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)  # type: ignore
+
         self.token = token
-        self.aeza_token = aeza_token
         self.session = session
-        self.data_dir = Path(data_dir)
-        self.data_dir.mkdir(parents=True, exist_ok=True)
         self.bot = Bot(token=self.token)
-        self.aeza = Aeza(token=self.aeza_token)
+        self.aeza = Aeza()
 
-        if (self.data_dir / "users.json").exists():
-            with open(self.data_dir / "users.json", "r") as file:
-                self.chat_db = ChatManager.load(file)
-        else:
-            self.chat_db = ChatManager()
-
-        self.cron = Cron(bot=self.bot, chat_db=self.chat_db, api=self.aeza)
+        self.cron = Cron(bot=self.bot, maker=self.sessionmaker, api=self.aeza)
 
         # Create dispatcher
         dispatcher = Dispatcher(storage=storage)
         # Add middlewares
-        dispatcher.message.middleware(ArgsMiddleware(chat_db=self.chat_db))
-        dispatcher.message.middleware(ErrorHandlerMiddleware())  # must be last
+        for event_type in ["message", "callback_query"]:
+            event_handler = getattr(dispatcher, event_type)
+            event_handler.middleware(DatabaseMiddleware(self.sessionmaker))
+            event_handler.middleware(ChatModelMiddleware())
+            event_handler.middleware(ErrorHandlerMiddleware())  # must be last
         # Add handlers
         dispatcher.include_router(router.router)
 
