@@ -38,3 +38,9 @@ async def start(message: Message, chat_model: ChatModel) -> None:
         await message.answer(Texts.start, reply_markup=Keyboard.subscribe)
     else:
         await message.answer(Texts.start_subscribed, reply_markup=Keyboard.unsubscribe)
+
+
+@router.message(Command("help"))
+async def help(message: Message) -> None:
+    """Help handler."""
+    await message.answer(Texts.help)
