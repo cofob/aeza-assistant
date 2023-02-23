@@ -13,6 +13,7 @@ from .aeza import Aeza
 from .constants import TARIFF_GROUPS
 from .models.chat import ChatModel
 from .state import BotState
+from .texts import Texts
 
 log = getLogger(__name__)
 
@@ -60,7 +61,11 @@ class Cron:
             self.queue.put_nowait(
                 self.bot.send_message(
                     chat.telegram_id,
-                    f"Тарифная группа {name} теперь {'включена' if status else 'выключена'}.",
+                    Texts.state_changed.format(
+                        Texts.available.format(name)
+                        if status
+                        else Texts.unavailable.format(name)
+                    ),
                 )
             )
 

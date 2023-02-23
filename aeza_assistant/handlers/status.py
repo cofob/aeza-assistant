@@ -12,8 +12,8 @@ async def status(message: Message, bot_state: BotState) -> None:
     text = []
     for name in bot_state.current_statuses:
         text.append(
-            name
-            + " "
-            + ("доступен" if bot_state.current_statuses[name] else "недоступен")
+            Texts.available.format(name)
+            if bot_state.current_statuses[name]
+            else Texts.unavailable.format(name)
         )
-    await message.answer("Текущий статус:\n" + ",\n".join(text) + ".")
+    await message.answer(Texts.current_status.format(",\n".join(text) + "."))
