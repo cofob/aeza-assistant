@@ -43,14 +43,14 @@ class Cron:
 
     async def run(self) -> None:
         while True:
-            log.info("Cron job started")
+            log.debug("Cron job started")
             session = self.maker()
             try:
                 await self.job(session)
             except Exception as e:
                 log.exception("Cron job failed")
                 log.exception(e)
-            log.info("Cron job finished")
+            log.debug("Cron job finished")
             await sleep(self.interval)
 
     async def send_notification(
