@@ -29,7 +29,7 @@ async def main_async() -> None:
         print("Usage: python -m bot [run]")
         exit(1)
 
-    async with ClientSession() as session:
+    async with ClientSession(trust_env=True) as session:
         bot = BotFabric(
             token=get_env("TOKEN"),
             database_url=get_env("DATABASE_URL"),
