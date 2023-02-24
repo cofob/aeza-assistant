@@ -38,6 +38,7 @@ Before running Aeza Assistant, you need to have Docker and Docker Compose instal
   ```
 
   This will start the Docker container in detached mode, which means it will run in the background.
+
 8. You can now interact with Aeza Assistant by sending messages to your Telegram bot.
 
 ## Using the Tor network
