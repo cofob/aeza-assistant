@@ -34,6 +34,7 @@ class BotFabric:
         token: str,
         database_url: str,
         push_addresses: str = "",
+        aeza_http_proxy: str | None = None,
         session: ClientSession = ClientSession(),
         storage: BaseStorage = MemoryStorage(),
     ) -> None:
@@ -50,7 +51,7 @@ class BotFabric:
         self.token = token
         self.session = session
         self.bot = Bot(token=self.token)
-        self.aeza = Aeza()
+        self.aeza = Aeza(session=self.session, http_proxy=aeza_http_proxy)
 
         self.cron = Cron(
             bot=self.bot,

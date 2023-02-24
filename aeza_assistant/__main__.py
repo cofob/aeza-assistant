@@ -34,6 +34,7 @@ async def main_async() -> None:
             token=get_env("TOKEN"),
             database_url=get_env("DATABASE_URL"),
             push_addresses=environ.get("PUSH_ADDRESSES", ""),
+            aeza_http_proxy=environ.get("AEZA_HTTP_PROXY", None),
             session=session,
         )
 
