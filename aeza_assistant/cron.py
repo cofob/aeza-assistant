@@ -53,7 +53,9 @@ class Cron:
             log.info("Cron job finished")
             await sleep(self.interval)
 
-    async def send_notification(self, session: AsyncSession, statuses: dict[str, bool]) -> None:
+    async def send_notification(
+        self, session: AsyncSession, statuses: dict[str, bool]
+    ) -> None:
         chats = await ChatModel.get_list_by_key(session, ChatModel.is_subscribed, True)
         for chat in chats:
             self.queue.put_nowait(
@@ -61,7 +63,9 @@ class Cron:
                     chat.telegram_id,
                     Texts.state_changed.format(
                         ",\n".join(
-                            Texts.available.format(name) if status else Texts.unavailable.format(name)
+                            Texts.available.format(name)
+                            if status
+                            else Texts.unavailable.format(name)
                             for name, status in statuses.items()
                         )
                         + "."
@@ -73,7 +77,9 @@ class Cron:
         async with self.session.get(url) as resp:
             log.debug(f"Push notification for {url} sent")
             if resp.status != 200:
-                log.error(f"Push notification for {url} failed with {resp.status}: {await resp.text()}")
+                log.error(
+                    f"Push notification for {url} failed with {resp.status}: {await resp.text()}"
+                )
 
     async def job(self, session: AsyncSession) -> None:
         statuses = await self.api.get_product_group_statuses()
@@ -103,14 +109,22 @@ class Cron:
                     curr_time,
                 )
                 changed_statuses.append(name)
-            elif name in self.prev_statuses and self.prev_statuses[name][0] == readable_statuses[name]:
+            elif (
+                name in self.prev_statuses
+                and self.prev_statuses[name][0] == readable_statuses[name]
+            ):
                 log.debug(f"Tariff group {name} is still {readable_statuses[name]}")
                 curr_statuses[name] = (
                     readable_statuses[name],
                     self.prev_statuses[name][1],
                 )
-            elif name in self.prev_statuses and self.prev_statuses[name][0] != readable_statuses[name]:
-                log.info(f"Tariff group {name} changed from {self.prev_statuses[name][0]} to {readable_statuses[name]}")
+            elif (
+                name in self.prev_statuses
+                and self.prev_statuses[name][0] != readable_statuses[name]
+            ):
+                log.info(
+                    f"Tariff group {name} changed from {self.prev_statuses[name][0]} to {readable_statuses[name]}"
+                )
                 curr_statuses[name] = (
                     readable_statuses[name],
                     curr_time,
@@ -126,7 +140,10 @@ class Cron:
 
         for name in self.prev_statuses:
             status, last_change = self.prev_statuses[name]
-            if curr_time - last_change >= self.notify_sleep and self.last_notified.get(name, status) is not status:
+            if (
+                curr_time - last_change >= self.notify_sleep
+                and self.last_notified.get(name, status) is not status
+            ):
                 self.last_notified[name] = status
                 changed[name] = status
 
