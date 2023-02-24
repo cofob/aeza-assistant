@@ -1,0 +1,36 @@
+name: Code lint
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Style check
+        run: |
+          poetry run black --check --diff .
+          poetry run isort --check --diff .
+
+      - name: Type check
+        run: |
+          poetry run mypy --install-types --non-interactive --show-error-codes --show-column-numbers --pretty .
