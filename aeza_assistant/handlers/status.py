@@ -1,6 +1,7 @@
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from ..constants import SORTED_GROUPS
 from ..state import BotState
 from ..texts import Texts
 from .router import router
@@ -10,7 +11,9 @@ from .router import router
 async def status(message: Message, bot_state: BotState) -> None:
     """Start handler."""
     text = []
-    for name in bot_state.current_statuses:
+    for name in SORTED_GROUPS:
+        if name not in bot_state.current_statuses:
+            continue
         text.append(
             Texts.available.format(name)
             if bot_state.current_statuses[name]

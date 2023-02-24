@@ -13,3 +13,6 @@ TARIFF_GROUPS = {
     1063: "SWEs",
     1068: "SWE",
 }
+
+SORTED_GROUPS = list(TARIFF_GROUPS.values())
+SORTED_GROUPS.sort()

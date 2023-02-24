@@ -14,12 +14,8 @@ from sqlalchemy.orm import sessionmaker
 from .aeza import Aeza
 from .cron import Cron
 from .handlers import router
-from .middlewares import (
-    ArgsMiddleware,
-    ChatModelMiddleware,
-    DatabaseMiddleware,
-    ErrorHandlerMiddleware,
-)
+from .middlewares import (ArgsMiddleware, ChatModelMiddleware,
+                          DatabaseMiddleware, ErrorHandlerMiddleware)
 from .queue import TaskQueue
 from .state import BotState
 
