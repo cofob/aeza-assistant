@@ -5,11 +5,11 @@ from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..callback_types.subscribe import SubscribeCallback
+from ..keyboards.subscribe import SubscribeKeyboard
 from ..models.chat import ChatModel
 from ..texts import Texts
 from ..utils import is_user_admin
 from .router import router
-from .start import Keyboard
 
 log = getLogger(__name__)
 
@@ -32,7 +32,7 @@ async def subscribe(
     await chat_model.save(db)
     await callback_query.answer(Texts.subscribed)
     await callback_query.message.edit_text(
-        Texts.start_subscribed, reply_markup=Keyboard.unsubscribe
+        Texts.start_subscribed, reply_markup=SubscribeKeyboard.unsubscribe
     )
 
 
@@ -53,4 +53,6 @@ async def unsubscribe(
     chat_model.is_subscribed = False
     await chat_model.save(db)
     await callback_query.answer(Texts.unsubscribed)
-    await callback_query.message.edit_text(Texts.start, reply_markup=Keyboard.subscribe)
+    await callback_query.message.edit_text(
+        Texts.start, reply_markup=SubscribeKeyboard.subscribe
+    )
