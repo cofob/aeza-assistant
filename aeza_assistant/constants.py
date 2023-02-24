@@ -1,6 +1,7 @@
 TARIFF_GROUPS = {
     1: "EP",
     3: "EPs",
+    26: "THR",
     842: "VIE",
     847: "VIEs",
     864: "DE",
@@ -12,6 +13,7 @@ TARIFF_GROUPS = {
     978: "HELs",
     1063: "SWEs",
     1068: "SWE",
+    960: "IC9",
 }
 
 SORTED_GROUPS = list(TARIFF_GROUPS.values())
