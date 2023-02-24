@@ -17,13 +17,14 @@ COPY aeza_assistant /aeza_assistant
 # Final image
 FROM python:3.11-slim AS final
 
-RUN apt-get update && apt-get install -y torsocks tor
-COPY torsocks_start.sh /torsocks_start.sh
+ENV AEZA_HTTP_PROXY=http://127.0.0.1:8118
+RUN apt-get update && apt-get install -y tor curl && echo "HTTPTunnelPort 8118" >> /etc/tor/torrc
 
 WORKDIR /app
 
 COPY --from=poetry /requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
+COPY torsocks_start.sh /torsocks_start.sh
 COPY --from=source / /app
 
 CMD ["bash", "/torsocks_start.sh"]

@@ -3,18 +3,20 @@ echo "Starting tor daemon..."
 tor &
 
 # Wait for tor to start
-echo "Waiting for tor to start... (sleep 60)"
-sleep 60
+echo "Waiting for tor to start..."
 
-# Start bot
-echo "Starting bot..."
-torsocks python -m aeza_assistant run
+# Endless loop, that checks if tor is running
+while true; do
+    # Check if tor is running (curl 8118 port)
+    if curl -x socks5://localhost:9050 http://eth0.me 2>&1 | grep "Connection refused"; then
+        # If not, wait 1 second and try again
+        echo "Waiting for tor to start..."
+        sleep 1
+    else
+        # If yes, break the loop
+        echo "Tor is running!"
+        break
+    fi
+done
 
-# Check if previous command was successful
-if [ $? -eq 0 ]; then
-    echo "Bot exited successfully."
-else
-    echo "Bot exited with error. Trying again... (sleep 120)"
-    sleep 120
-    torsocks python -m aeza_assistant run
-fi
+python -m aeza_assistant run
