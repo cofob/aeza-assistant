@@ -10,6 +10,9 @@ from .router import router
 @router.message(Command("status"))
 async def status(message: Message, bot_state: BotState) -> None:
     """Start handler."""
+    if not bot_state.current_statuses:
+        await message.answer(Texts.bot_is_loading)
+        return
     text = []
     for name in SORTED_GROUPS:
         if name not in bot_state.current_statuses:
