@@ -15,13 +15,13 @@ services:
       - ./data:/var/lib/postgresql/data
 
   bot:
-    image: ghcr.io/cofob/aeza-assisstant:latest
+    image: ghcr.io/cofob/aeza-assistant:latest
 
     restart: always
 
     environment:
       TOKEN: "1234567890:ABCDEF1234567890ABCDEF1234567890ABC"
-      DATABASE_URL: "postgresql+asyncpg://user:password@localhost/db"
+      DATABASE_URL: "postgresql+asyncpg://user:password@db/db"
 
     depends_on:
       - db
