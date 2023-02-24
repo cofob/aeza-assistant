@@ -49,6 +49,8 @@ If you want to use Aeza Assistant through the Tor network, you can use the `ghcr
 image: ghcr.io/cofob/aeza-assistant:torsocks
 ```
 
+**Why do we need the Tor version?** The reason is that Aeza blocks connections to its API from its own servers, so you need to use a different IP, such as the one from Tor.
+
 ## Conclusion
 
 Congratulations! You have successfully set up Aeza Assistant and can now receive notifications about changes in location sales in the Aeza hosting service. If you have any questions or feedback, please feel free to reach out to the developers at [issues](https://github.com/cofob/aeza-assistant/issues).
