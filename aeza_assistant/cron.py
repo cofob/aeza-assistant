@@ -32,7 +32,7 @@ class Cron:
         self.bot = bot
         self.maker = maker
         self.interval = 50
-        self.notify_sleep = 60 * 30
+        self.notify_sleep = 60 * 60
         self.api = api
         self.queue = queue
         self.bot_state = bot_state
