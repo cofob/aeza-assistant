@@ -53,25 +53,37 @@ class Cron:
             log.debug("Cron job finished")
             await sleep(self.interval)
 
+    async def _send_notification_message(self, chat_id: int, text: str) -> None:
+        """Send a notification message to the chat."""
+        log.debug(f"Sending notification to {chat_id}")
+        try:
+            await self.bot.send_message(chat_id, text)
+        except Exception as e:
+            log.exception(f"Failed to send notification to {chat_id}")
+            log.exception(e)
+
     async def send_notification(
         self, session: AsyncSession, statuses: dict[str, bool]
     ) -> None:
+        """Send a notification to all subscribed chats."""
+        text = Texts.state_changed.format(
+            ",\n".join(
+                Texts.available.format(name)
+                if status
+                else Texts.unavailable.format(name)
+                for name, status in statuses.items()
+            )
+            + "."
+        )
         chats = await ChatModel.get_list_by_key(session, ChatModel.is_subscribed, True)
         for chat in chats:
-            self.queue.put_nowait(
-                self.bot.send_message(
-                    chat.telegram_id,
-                    Texts.state_changed.format(
-                        ",\n".join(
-                            Texts.available.format(name)
-                            if status
-                            else Texts.unavailable.format(name)
-                            for name, status in statuses.items()
-                        )
-                        + "."
-                    ),
+            try:
+                self.queue.put_nowait(
+                    self._send_notification_message(chat.telegram_id, text)
                 )
-            )
+            except Exception as e:
+                log.exception(f"Failed to add notification to queue for {chat}")
+                log.exception(e)
 
     async def send_push(self, url: str) -> None:
         async with self.session.get(url) as resp:
@@ -148,4 +160,4 @@ class Cron:
                 changed[name] = status
 
         if changed:
-            await self.send_notification(session, changed)
+            create_task(self.send_notification(session, changed))
