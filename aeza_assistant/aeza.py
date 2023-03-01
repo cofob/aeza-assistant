@@ -34,7 +34,7 @@ class Aeza:
         for group in resp["data"]["items"]:
             try:
                 id_ = group["id"]
-                status = group["group"]["payload"]["isDisabled"] == "true"
+                status = group["group"]["payload"]["isDisabled"] in ["true", True]
                 out[id_] = False if status else True
             except (KeyError, TypeError):
                 pass
