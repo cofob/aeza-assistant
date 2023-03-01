@@ -44,13 +44,9 @@ class Cron:
     async def run(self) -> None:
         while True:
             log.debug("Cron job started")
-            session = self.maker()
-            try:
-                await self.job(session)
-            except Exception as e:
-                log.exception("Cron job failed")
-                log.exception(e)
-            log.debug("Cron job finished")
+            session: AsyncSession = self.maker()
+            t = create_task(self.job(session))
+            t.add_done_callback(lambda x: create_task(session.close()))
             await sleep(self.interval)
 
     async def _send_notification_message(self, chat_id: int, text: str) -> None:
@@ -160,4 +156,4 @@ class Cron:
                 changed[name] = status
 
         if changed:
-            create_task(self.send_notification(session, changed))
+            await self.send_notification(session, changed)
