@@ -3,6 +3,7 @@
 from asyncio import Queue, create_task, sleep
 from logging import getLogger
 from time import time
+from typing import Sequence
 
 from aiogram import Bot
 from aiohttp import ClientSession
@@ -44,9 +45,12 @@ class Cron:
     async def run(self) -> None:
         while True:
             log.debug("Cron job started")
-            session: AsyncSession = self.maker()
-            t = create_task(self.job(session))
-            t.add_done_callback(lambda x: create_task(session.close()))
+            try:
+                async with self.maker() as session:
+                    await self.job(session)
+            except Exception as e:
+                log.exception("Cron job failed")
+                log.exception(e)
             await sleep(self.interval)
 
     async def _send_notification_message(self, chat_id: int, text: str) -> None:
@@ -59,7 +63,7 @@ class Cron:
             log.exception(e)
 
     async def send_notification(
-        self, session: AsyncSession, statuses: dict[str, bool]
+        self, statuses: dict[str, bool], chats: Sequence[ChatModel]
     ) -> None:
         """Send a notification to all subscribed chats."""
         text = Texts.state_changed.format(
@@ -71,7 +75,6 @@ class Cron:
             )
             + "."
         )
-        chats = await ChatModel.get_list_by_key(session, ChatModel.is_subscribed, True)
         for chat in chats:
             try:
                 self.queue.put_nowait(
@@ -156,4 +159,8 @@ class Cron:
                 changed[name] = status
 
         if changed:
-            await self.send_notification(session, changed)
+            chats = await ChatModel.get_list_by_key(
+                session, ChatModel.is_subscribed, True
+            )
+            log.debug(f"Sending notifications to {len(chats)} chats")
+            await self.send_notification(changed, chats)
