@@ -32,7 +32,7 @@ class Cron:
     ) -> None:
         self.bot = bot
         self.maker = maker
-        self.interval = 50
+        self.interval = 45
         self.notify_sleep = 60 * 60
         self.api = api
         self.queue = queue
@@ -63,7 +63,7 @@ class Cron:
             log.exception(e)
 
     async def send_notification(
-        self, statuses: dict[str, bool], chats: Sequence[ChatModel]
+        self, session: AsyncSession, statuses: dict[str, bool]
     ) -> None:
         """Send a notification to all subscribed chats."""
         text = Texts.state_changed.format(
@@ -75,14 +75,21 @@ class Cron:
             )
             + "."
         )
-        for chat in chats:
-            try:
+        i = 0
+        limit = 150
+        chats: Sequence[ChatModel] = []
+        while True:
+            chats = await ChatModel.get_list_by_key(
+                session, ChatModel.is_subscribed, True, limit=limit, offset=i * limit
+            )
+            if not chats:
+                break
+            for chat in chats:
                 self.queue.put_nowait(
                     self._send_notification_message(chat.telegram_id, text)
                 )
-            except Exception as e:
-                log.exception(f"Failed to add notification to queue for {chat}")
-                log.exception(e)
+            i += 1
+        log.info(f"Sent notification to approx ~{i * limit} chats")
 
     async def send_push(self, url: str) -> None:
         async with self.session.get(url) as resp:
@@ -159,8 +166,4 @@ class Cron:
                 changed[name] = status
 
         if changed:
-            chats = await ChatModel.get_list_by_key(
-                session, ChatModel.is_subscribed, True
-            )
-            log.debug(f"Sending notifications to {len(chats)} chats")
-            await self.send_notification(changed, chats)
+            await self.send_notification(session, changed)
