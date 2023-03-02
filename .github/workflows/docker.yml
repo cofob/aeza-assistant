@@ -32,7 +32,7 @@ jobs:
         with:
           string: ${{ github.repository }}
 
-      - name: Build and push clearner
+      - name: Build and push clearnet
         uses: docker/build-push-action@v3
         with:
           push: true
