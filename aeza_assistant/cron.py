@@ -32,7 +32,7 @@ class Cron:
     ) -> None:
         self.bot = bot
         self.maker = maker
-        self.interval = 45
+        self.interval = 58
         self.notify_sleep = 60 * 60
         self.api = api
         self.queue = queue
@@ -46,8 +46,7 @@ class Cron:
         while True:
             log.debug("Cron job started")
             try:
-                async with self.maker() as session:
-                    await self.job(session)
+                create_task(self.job())
             except Exception as e:
                 log.exception("Cron job failed")
                 log.exception(e)
@@ -99,7 +98,11 @@ class Cron:
                     f"Push notification for {url} failed with {resp.status}: {await resp.text()}"
                 )
 
-    async def job(self, session: AsyncSession) -> None:
+    async def job(self) -> None:
+        async with self.maker() as session:
+            await self._job(session)
+
+    async def _job(self, session: AsyncSession) -> None:
         statuses = await self.api.get_product_group_statuses()
         readable_statuses = {}
         for group_id, status in statuses.items():
