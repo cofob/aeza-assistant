@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from aiogram.filters import Command
 from aiogram.types import Message
 
@@ -11,15 +13,23 @@ from .router import router
 async def status(message: Message, bot_state: BotState) -> None:
     """Start handler."""
     if not bot_state.current_statuses:
-        await message.answer(Texts.bot_is_loading)
-        return
-    text = []
-    for name in SORTED_GROUPS:
-        if name not in bot_state.current_statuses:
-            continue
-        text.append(
-            Texts.available.format(name)
-            if bot_state.current_statuses[name]
-            else Texts.unavailable.format(name)
-        )
-    await message.answer(Texts.current_status.format(",\n".join(text) + "."))
+        m = await message.answer(Texts.bot_is_loading)
+    else:
+        text = []
+        for name in SORTED_GROUPS:
+            if name not in bot_state.current_statuses:
+                continue
+            text.append(
+                Texts.available.format(name)
+                if bot_state.current_statuses[name]
+                else Texts.unavailable.format(name)
+            )
+        m = await message.answer(Texts.current_status.format(",\n".join(text) + "."))
+
+    if message.chat.type != "private":
+        await sleep(60)
+        await m.delete()
+        try:
+            await message.delete()
+        except Exception:
+            pass

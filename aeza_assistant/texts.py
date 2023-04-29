@@ -7,6 +7,7 @@ class Texts:
 /start. \n/status для получения текущего статуса.\nВеб-страница мониторинга https://aeza-monitor.cofob.dev/status/locations\
 \n\nБота написал @cofob (открыт для работы) за 5 часов на Python и aiogram, исходники \
 - https://github.com/cofob/aeza-assistant"
+    pm_for_command = "Напиши в ЛС с этой командой, в чатах она не отключена."
     no_rights = "Недостаточно прав для выполнения этой команды."
     subscribe = "Получать уведомления"
     subscribed = "Вы подписались на уведомления!"
