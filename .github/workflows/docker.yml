@@ -26,6 +26,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: cofob
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Lowercase repository name
         id: repo
         uses: ASzc/change-string-case-action@v1
@@ -40,6 +46,14 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ghcr.io/${{ steps.repo.outputs.lowercase }}
 
+      - name: Push clearnet to dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.repo.outputs.lowercase }}
+
       - name: Build and push torsocks
         uses: docker/build-push-action@v3
         with:
@@ -47,4 +61,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ghcr.io/${{ steps.repo.outputs.lowercase }}:torsocks
+          file: ./Dockerfile.torsocks
+
+      - name: Push torsocks to dockerhub
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.repo.outputs.lowercase }}:torsocks
           file: ./Dockerfile.torsocks
