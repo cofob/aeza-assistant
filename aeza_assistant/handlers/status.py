@@ -28,7 +28,10 @@ async def status(message: Message, bot_state: BotState) -> None:
 
     if message.chat.type != "private":
         await sleep(60)
-        await m.delete()
+        try:
+            await m.delete()
+        except Exception:
+            pass
         try:
             await message.delete()
         except Exception:
