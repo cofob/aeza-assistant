@@ -36,8 +36,15 @@ class Aeza:
         for group in resp["data"]["items"]:
             try:
                 id_ = group["id"]
-                status = group["group"]["payload"]["isDisabled"] in ["true", True]
+                status = group["group"]["payload"].get("isDisabled", False) in [
+                    "true",
+                    True,
+                ]
                 out[id_] = False if status else True
             except (KeyError, TypeError) as e:
-                log.debug(e)
+                if group is None:
+                    continue
+                log.debug(
+                    f"Error in get_product_group_statuses, id: {group.get('id', 'ID not defined')}: {str(e)}"
+                )
         return out
