@@ -104,12 +104,14 @@ class Cron:
 
     async def _job(self, session: AsyncSession) -> None:
         statuses = await self.api.get_product_group_statuses()
+        log.debug(f"(_job) Statuses: {statuses}")
         readable_statuses = {}
         for group_id, status in statuses.items():
             try:
                 readable_statuses[TARIFF_GROUPS[group_id]] = status
             except KeyError:
                 pass
+        log.debug(f"(_job) Readable statuses: {readable_statuses}")
 
         self.bot_state.current_statuses = readable_statuses
 

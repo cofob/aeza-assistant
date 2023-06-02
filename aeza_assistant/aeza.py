@@ -1,7 +1,9 @@
-from json import dumps
+from logging import getLogger
 from typing import Any
 
 from aiohttp import ClientSession
+
+log = getLogger(__name__)
 
 
 class Aeza:
@@ -36,6 +38,6 @@ class Aeza:
                 id_ = group["id"]
                 status = group["group"]["payload"]["isDisabled"] in ["true", True]
                 out[id_] = False if status else True
-            except (KeyError, TypeError):
-                pass
+            except (KeyError, TypeError) as e:
+                log.debug(e)
         return out
