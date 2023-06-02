@@ -19,5 +19,23 @@ TARIFF_GROUPS = {
     960: "IC9",
 }
 
-SORTED_GROUPS = list(TARIFF_GROUPS.values())
-SORTED_GROUPS.sort()
+SORTED_GROUPS = [
+    "EP",
+    "EPs",
+    "PAR",
+    "PARs",
+    "VIE",
+    "VIEs",
+    "DE",
+    "DEs",
+    "NL",
+    "NLs",
+    "HEL",
+    "HELs",
+    "SWE",
+    "SWEs",
+    "IC9",
+    "THR",
+    "AMS-PROMO",
+    "SWE-PROMO"
+]
