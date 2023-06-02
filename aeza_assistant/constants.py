@@ -37,5 +37,5 @@ SORTED_GROUPS = [
     "IC9",
     "THR",
     "AMS-PROMO",
-    "SWE-PROMO"
+    "SWE-PROMO",
 ]
