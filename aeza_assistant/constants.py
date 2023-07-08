@@ -1,6 +1,6 @@
 TARIFF_GROUPS = {
-    1: "EP",
-    3: "EPs",
+    311: "MSK",
+    316: "MSKs",
     26: "THR",
     32: "PAR",
     37: "PARs",
@@ -20,8 +20,8 @@ TARIFF_GROUPS = {
 }
 
 SORTED_GROUPS = [
-    "EP",
-    "EPs",
+    "MSK",
+    "MSKs",
     "PAR",
     "PARs",
     "VIE",
