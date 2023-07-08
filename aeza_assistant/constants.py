@@ -11,7 +11,6 @@ TARIFF_GROUPS = {
     869: "DEs",
     951: "NLs",
     956: "NL",
-    959: "AMS-PROMO",
     973: "HEL",
     978: "HELs",
     1063: "SWEs",
@@ -36,6 +35,5 @@ SORTED_GROUPS = [
     "SWEs",
     "IC9",
     "THR",
-    "AMS-PROMO",
     "SWE-PROMO",
 ]
