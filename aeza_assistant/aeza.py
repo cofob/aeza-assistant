@@ -14,7 +14,7 @@ class Aeza:
         http_proxy: str | None = None,
     ) -> None:
         self.session = session
-        self.base_url = "https://core.aeza.net/api/"
+        self.base_url = "https://my.aeza.net/api/"
         self.http_proxy = http_proxy
 
         self.headers = {}
