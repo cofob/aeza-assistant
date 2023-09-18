@@ -38,7 +38,7 @@ jobs:
         with:
           string: ${{ github.repository }}
 
-      - name: Build and push clearnet
+      - name: Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
@@ -46,28 +46,10 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ghcr.io/${{ steps.repo.outputs.lowercase }}
 
-      - name: Push clearnet to dockerhub
+      - name: Push to dockerhub
         uses: docker/build-push-action@v3
         with:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ steps.repo.outputs.lowercase }}
-
-      - name: Build and push torsocks
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ steps.repo.outputs.lowercase }}:torsocks
-          file: ./Dockerfile.torsocks
-
-      - name: Push torsocks to dockerhub
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ${{ steps.repo.outputs.lowercase }}:torsocks
-          file: ./Dockerfile.torsocks
