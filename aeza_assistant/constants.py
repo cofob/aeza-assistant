@@ -11,10 +11,10 @@ TARIFF_GROUPS = {
     869: "DEs",
     951: "NLs",
     956: "NL",
-    973: "HEL",
-    978: "HELs",
-    1063: "SWEs",
-    1068: "SWE",
+    128: "HEL",
+    133: "HELs",
+    122: "SWEs",
+    127: "SWE",
     960: "IC9",
 }
 
