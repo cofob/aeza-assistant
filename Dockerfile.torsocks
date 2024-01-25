@@ -1,0 +1,30 @@
+# Export pip dependencies
+FROM python:3.11-slim AS poetry
+
+RUN pip install poetry
+COPY poetry.lock pyproject.toml /
+RUN poetry export -f requirements.txt -o /requirements.txt
+
+# Copy source code
+FROM scratch as source
+
+WORKDIR /
+COPY alembic.ini /alembic.ini
+COPY migrations /migrations
+COPY aeza_assistant /aeza_assistant
+
+
+# Final image
+FROM python:3.11-slim AS final
+
+ENV AEZA_HTTP_PROXY=http://127.0.0.1:8118
+RUN apt-get update && apt-get install -y tor curl && echo "HTTPTunnelPort 8118" >> /etc/tor/torrc
+
+WORKDIR /app
+
+COPY --from=poetry /requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
+COPY torsocks_start.sh /torsocks_start.sh
+COPY --from=source / /app
+
+CMD ["bash", "/torsocks_start.sh"]
