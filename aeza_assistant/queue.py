@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 
 class TaskQueue:
-    def __init__(self, queue: asyncio.Queue, sleep_time: float = 0.3) -> None:
+    def __init__(self, queue: asyncio.Queue, sleep_time: float = 0.1) -> None:
         self.queue = queue
         self.sleep_time = sleep_time
         self.task: asyncio.Task[Any] | None = None

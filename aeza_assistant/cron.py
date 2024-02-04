@@ -6,6 +6,7 @@ from time import time
 from typing import Sequence
 
 from aiogram import Bot
+from aiogram.exceptions import TelegramRetryAfter
 from aiohttp import ClientSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -55,11 +56,22 @@ class Cron:
     async def _send_notification_message(self, chat_id: int, text: str) -> None:
         """Send a notification message to the chat."""
         log.debug(f"Sending notification to {chat_id}")
-        try:
-            await self.bot.send_message(chat_id, text)
-        except Exception as e:
-            log.exception(f"Failed to send notification to {chat_id}")
-            log.exception(e)
+        retry_count = 0
+        while True:
+            if retry_count >= 3:
+                log.error(f"Failed to send notification to {chat_id} too many times")
+                break
+            try:
+                await self.bot.send_message(chat_id, text)
+            except TelegramRetryAfter as e:
+                log.debug(
+                    f"Failed to send notification to {chat_id}, retrying in {e.retry_after} seconds"
+                )
+                await sleep(e.retry_after)
+                retry_count += 1
+            except Exception as e:
+                log.exception(f"Failed to send notification to {chat_id}")
+                break
 
     async def send_notification(
         self, session: AsyncSession, statuses: dict[str, bool]
@@ -75,7 +87,7 @@ class Cron:
             + "."
         )
         i = 0
-        limit = 150
+        limit = 1000
         chats: Sequence[ChatModel] = []
         while True:
             chats = await ChatModel.get_list_by_key(
