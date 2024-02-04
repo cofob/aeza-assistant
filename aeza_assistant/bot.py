@@ -35,8 +35,8 @@ class BotFabric:
         database_url: str,
         push_addresses: str = "",
         aeza_http_proxy: str | None = None,
-        session: ClientSession = ClientSession(),
-        storage: BaseStorage = MemoryStorage(),
+        session: ClientSession | None = None,
+        storage: BaseStorage | None = None,
     ) -> None:
         """Initialize bot fabric."""
         self.state = BotState(current_statuses={})
@@ -49,7 +49,7 @@ class BotFabric:
         self.sessionmaker = sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)  # type: ignore
 
         self.token = token
-        self.session = session
+        self.session = session or ClientSession()
         self.bot = Bot(token=self.token)
         self.aeza = Aeza(session=self.session, http_proxy=aeza_http_proxy)
 
@@ -64,6 +64,7 @@ class BotFabric:
         )
 
         # Create dispatcher
+        storage = storage or MemoryStorage()
         dispatcher = Dispatcher(storage=storage)
         # Add middlewares
         for event_type in ["message", "callback_query"]:
