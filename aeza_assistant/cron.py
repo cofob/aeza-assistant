@@ -69,9 +69,11 @@ class Cron:
                 )
                 await sleep(e.retry_after)
                 retry_count += 1
+                continue
             except Exception as e:
                 log.exception(f"Failed to send notification to {chat_id}")
                 break
+            break
 
     async def send_notification(
         self, session: AsyncSession, statuses: dict[str, bool]
