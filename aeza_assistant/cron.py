@@ -64,7 +64,7 @@ class Cron:
             try:
                 await self.bot.send_message(chat_id, text)
             except TelegramRetryAfter as e:
-                log.debug(
+                log.info(
                     f"Failed to send notification to {chat_id}, retrying in {e.retry_after} seconds"
                 )
                 await sleep(e.retry_after)
@@ -79,9 +79,11 @@ class Cron:
         """Send a notification to all subscribed chats."""
         text = Texts.state_changed.format(
             ",\n".join(
-                Texts.available.format(name)
-                if status
-                else Texts.unavailable.format(name)
+                (
+                    Texts.available.format(name)
+                    if status
+                    else Texts.unavailable.format(name)
+                )
                 for name, status in statuses.items()
             )
             + "."
