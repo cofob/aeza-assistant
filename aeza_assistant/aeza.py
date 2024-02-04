@@ -10,10 +10,10 @@ class Aeza:
     def __init__(
         self,
         token: str | None = None,
-        session: ClientSession = ClientSession(),
+        session: ClientSession | None = None,
         http_proxy: str | None = None,
     ) -> None:
-        self.session = session
+        self.session = session or ClientSession()
         self.base_url = "https://my.aeza.net/api/"
         self.http_proxy = http_proxy
 
