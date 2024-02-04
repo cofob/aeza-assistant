@@ -41,10 +41,10 @@ class Aeza:
                     True,
                 ]
                 out[id_] = False if status else True
-            except (KeyError, TypeError) as e:
+            except (KeyError, TypeError):
                 if group is None:
                     continue
-                log.debug(
-                    f"Error in get_product_group_statuses, id: {group.get('id', 'ID not defined')}: {str(e)}"
+                log.exception(
+                    f"Error in get_product_group_statuses, id: {group.get('id', 'ID not defined')}"
                 )
         return out
