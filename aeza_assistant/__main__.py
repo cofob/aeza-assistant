@@ -1,7 +1,6 @@
 """Main entry point for the bot."""
 
-from asyncio import get_event_loop, run
-from json import loads
+from asyncio import get_event_loop
 from logging import basicConfig
 from os import environ
 from sys import argv, exit
