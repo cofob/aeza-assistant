@@ -17,7 +17,7 @@ TARIFF_GROUPS = {
     107: "ALB",
     112: "ALBs",
     960: "IC9",
-    26: "THR",
+    200: "IC14",
 }
 
 SORTED_GROUPS = [
@@ -38,6 +38,6 @@ SORTED_GROUPS = [
     "SWE",
     "SWEs",
     "IC9",
-    "THR",
+    "IC14",
     "SWE-PROMO",
 ]
