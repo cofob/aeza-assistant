@@ -16,7 +16,7 @@ TARIFF_GROUPS = {
     127: "SWE",
     107: "ALB",
     112: "ALBs",
-    26: "THR",
+    205: "THR",
     960: "IC9",
     200: "IC14",
 }
