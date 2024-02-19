@@ -3,7 +3,7 @@ from typing import Any
 
 from aiohttp import ClientSession
 
-log = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Aeza:
@@ -44,7 +44,7 @@ class Aeza:
             except (KeyError, TypeError):
                 if group is None:
                     continue
-                log.exception(
+                logger.debug(
                     f"Error in get_product_group_statuses, id: {group.get('id', 'ID not defined')}"
                 )
         return out
