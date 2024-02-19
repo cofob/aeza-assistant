@@ -1,10 +1,10 @@
 """Main entry point for the bot."""
 
 from asyncio import get_event_loop, sleep
+from json import loads
 from logging import basicConfig
 from os import environ
 from sys import argv, exit
-from json import loads
 
 from aiohttp import ClientSession
 
@@ -20,13 +20,18 @@ def get_env(name: str) -> str:
         exit(1)
 
 
+def print_help() -> None:
+    """Print help."""
+    print("Usage: python -m bot [run|notify] <notify:manual statuses json>")
+
+
 async def main_async() -> None:
     """Run the bot."""
     basicConfig(
         level=environ.get("LOG_LEVEL", "INFO").upper(), filename=environ.get("LOG_FILE")
     )
     if len(argv) < 2:
-        print("Usage: python -m bot [run]")
+        print_help()
         exit(1)
 
     async with ClientSession(trust_env=True) as session:
@@ -50,7 +55,7 @@ async def main_async() -> None:
                 if bot.task_queue.queue.empty():
                     break
         else:
-            print("Usage: python -m bot [run|notify]")
+            print_help()
             exit(1)
 
 
