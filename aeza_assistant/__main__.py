@@ -1,9 +1,10 @@
 """Main entry point for the bot."""
 
-from asyncio import get_event_loop
+from asyncio import get_event_loop, sleep
 from logging import basicConfig
 from os import environ
 from sys import argv, exit
+from json import loads
 
 from aiohttp import ClientSession
 
@@ -39,8 +40,17 @@ async def main_async() -> None:
 
         if argv[1] == "run":
             await bot.run()
+        elif argv[1] == "notify":
+            statuses = loads(argv[2])
+            async with bot.cron.maker() as db:
+                await bot.cron.send_notification(db, statuses)
+            await bot.task_queue.start()
+            while True:
+                await sleep(1)
+                if bot.task_queue.queue.empty():
+                    break
         else:
-            print("Usage: python -m bot [run]")
+            print("Usage: python -m bot [run|notify]")
             exit(1)
 
 
