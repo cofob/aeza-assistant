@@ -3,21 +3,19 @@
 from asyncio import Queue, create_task, sleep
 from logging import getLogger
 from time import time
-from typing import Sequence
 
 from aiogram import Bot
-from aiogram.exceptions import TelegramRetryAfter
 from aiohttp import ClientSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from .aeza import Aeza
 from .constants import TARIFF_GROUPS
-from .models.chat import ChatModel
 from .state import BotState
 from .texts import Texts
+from .utils import send_notification_message, subscribed_chat_iterator
 
-log = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Cron:
@@ -45,35 +43,13 @@ class Cron:
 
     async def run(self) -> None:
         while True:
-            log.debug("Cron job started")
+            logger.debug("Cron job started")
             try:
                 create_task(self.job())
             except Exception as e:
-                log.exception("Cron job failed")
-                log.exception(e)
+                logger.exception("Cron job failed")
+                logger.exception(e)
             await sleep(self.interval)
-
-    async def _send_notification_message(self, chat_id: int, text: str) -> None:
-        """Send a notification message to the chat."""
-        log.debug(f"Sending notification to {chat_id}")
-        retry_count = 0
-        while True:
-            if retry_count >= 3:
-                log.error(f"Failed to send notification to {chat_id} too many times")
-                break
-            try:
-                await self.bot.send_message(chat_id, text)
-            except TelegramRetryAfter as e:
-                log.info(
-                    f"Failed to send notification to {chat_id}, retrying in {e.retry_after} seconds"
-                )
-                await sleep(e.retry_after)
-                retry_count += 1
-                continue
-            except Exception as e:
-                log.exception(f"Failed to send notification to {chat_id}")
-                break
-            break
 
     async def send_notification(
         self, session: AsyncSession, statuses: dict[str, bool]
@@ -91,26 +67,17 @@ class Cron:
             + "."
         )
         i = 0
-        limit = 1000
-        chats: Sequence[ChatModel] = []
-        while True:
-            chats = await ChatModel.get_list_by_key(
-                session, ChatModel.is_subscribed, True, limit=limit, offset=i * limit
+        async for chat in subscribed_chat_iterator(session):
+            await self.queue.put(
+                send_notification_message(self.bot, chat.telegram_id, text)
             )
-            if not chats:
-                break
-            for chat in chats:
-                self.queue.put_nowait(
-                    self._send_notification_message(chat.telegram_id, text)
-                )
-            i += 1
-        log.info(f"Sent notification to approx ~{i * limit} chats")
+        logger.info(f"Sent notification to approx ~{i} chats")
 
     async def send_push(self, url: str) -> None:
         async with self.session.get(url) as resp:
-            log.debug(f"Push notification for {url} sent")
+            logger.debug(f"Push notification for {url} sent")
             if resp.status != 200:
-                log.error(
+                logger.error(
                     f"Push notification for {url} failed with {resp.status}: {await resp.text()}"
                 )
 
@@ -120,14 +87,14 @@ class Cron:
 
     async def _job(self, session: AsyncSession) -> None:
         statuses = await self.api.get_product_group_statuses()
-        log.debug(f"(_job) Statuses: {statuses}")
+        logger.debug(f"(_job) Statuses: {statuses}")
         readable_statuses = {}
         for group_id, status in statuses.items():
             try:
                 readable_statuses[TARIFF_GROUPS[group_id]] = status
             except KeyError:
                 pass
-        log.debug(f"(_job) Readable statuses: {readable_statuses}")
+        logger.debug(f"(_job) Readable statuses: {readable_statuses}")
 
         self.bot_state.current_statuses = readable_statuses
 
@@ -142,7 +109,7 @@ class Cron:
 
         for name in readable_statuses:
             if name not in self.prev_statuses:
-                log.debug(f"New tariff group: {name}")
+                logger.debug(f"New tariff group: {name}")
                 self.prev_statuses[name] = (
                     readable_statuses[name],
                     curr_time,
@@ -152,7 +119,7 @@ class Cron:
                 name in self.prev_statuses
                 and self.prev_statuses[name][0] == readable_statuses[name]
             ):
-                log.debug(f"Tariff group {name} is still {readable_statuses[name]}")
+                logger.debug(f"Tariff group {name} is still {readable_statuses[name]}")
                 curr_statuses[name] = (
                     readable_statuses[name],
                     self.prev_statuses[name][1],
@@ -161,7 +128,7 @@ class Cron:
                 name in self.prev_statuses
                 and self.prev_statuses[name][0] != readable_statuses[name]
             ):
-                log.info(
+                logger.info(
                     f"Tariff group {name} changed from {self.prev_statuses[name][0]} to {readable_statuses[name]}"
                 )
                 curr_statuses[name] = (

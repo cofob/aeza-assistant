@@ -1,12 +1,14 @@
 from asyncio import sleep
 
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
 from ..constants import SORTED_GROUPS
 from ..state import BotState
 from ..texts import Texts
-from .router import router
+
+router = Router()
 
 
 @router.message(Command("status"))

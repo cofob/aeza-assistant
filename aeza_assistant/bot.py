@@ -15,7 +15,6 @@ from .aeza import Aeza
 from .cron import Cron
 from .handlers import router
 from .middlewares import (
-    ArgsMiddleware,
     ChatModelMiddleware,
     DatabaseMiddleware,
     ErrorHandlerMiddleware,
@@ -23,7 +22,7 @@ from .middlewares import (
 from .queue import TaskQueue
 from .state import BotState
 
-log = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class BotFabric:
@@ -40,7 +39,7 @@ class BotFabric:
     ) -> None:
         """Initialize bot fabric."""
         self.state = BotState(current_statuses={})
-        self.queue: Queue[Any] = Queue()
+        self.queue: Queue[Any] = Queue(1000)
         self.task_queue = TaskQueue(self.queue)
 
         self.engine = create_async_engine(
@@ -50,7 +49,7 @@ class BotFabric:
 
         self.token = token
         self.session = session or ClientSession()
-        self.bot = Bot(token=self.token)
+        self.bot = Bot(token=self.token, parse_mode="HTML")
         self.aeza = Aeza(session=self.session, http_proxy=aeza_http_proxy)
 
         self.cron = Cron(
@@ -65,16 +64,15 @@ class BotFabric:
 
         # Create dispatcher
         storage = storage or MemoryStorage()
-        dispatcher = Dispatcher(storage=storage)
+        dispatcher = Dispatcher(storage=storage, queue=self.queue, bot_state=self.state)
         # Add middlewares
         for event_type in ["message", "callback_query"]:
             event_handler = getattr(dispatcher, event_type)
-            event_handler.middleware(ArgsMiddleware(bot_state=self.state))
             event_handler.middleware(DatabaseMiddleware(self.sessionmaker))
             event_handler.middleware(ChatModelMiddleware())
             event_handler.middleware(ErrorHandlerMiddleware())  # must be last
         # Add handlers
-        dispatcher.include_router(router.router)
+        dispatcher.include_router(router)
 
         self.dispatcher = dispatcher
 

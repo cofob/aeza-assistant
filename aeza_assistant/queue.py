@@ -1,8 +1,8 @@
 import asyncio
-import logging
+from logging import getLogger
 from typing import Any
 
-log = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class TaskQueue:
@@ -17,8 +17,8 @@ class TaskQueue:
             try:
                 await task
             except Exception as e:
-                log.exception("Exception in task queue")
-                log.exception(e)
+                logger.exception("Exception in task queue")
+                logger.exception(e)
             await asyncio.sleep(self.sleep_time)
 
     async def start(self) -> None:

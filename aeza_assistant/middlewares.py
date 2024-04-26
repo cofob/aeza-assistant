@@ -8,24 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from .models.chat import ChatModel
 
-log = getLogger(__name__)
-
-
-class ArgsMiddleware(BaseMiddleware):
-    def __init__(self, **kwargs: Any) -> None:
-        self.data = kwargs
-
-    # This code was taken from aiogram documentation, so it's not my fault that it's can't be type checked with mypy
-    async def __call__(  # type: ignore
-        self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-        event: Message,
-        data: Dict[str, Any],
-    ) -> Any:
-        for key, value in self.data.items():
-            data[key] = value
-
-        return await handler(event, data)
+logger = getLogger(__name__)
 
 
 class ErrorHandlerMiddleware(BaseMiddleware):
@@ -40,11 +23,11 @@ class ErrorHandlerMiddleware(BaseMiddleware):
         except Exception as e:
             exception_id = randint(100000000, 999999999)
 
-            log.exception(f"Exception ID: {exception_id}")
-            log.exception(e)
+            logger.exception(f"Exception ID: {exception_id}")
+            logger.exception(e)
 
             return await event.answer(
-                f"Произошла ошибка. Попробуйте позже. Код ошибки {exception_id}, можете сообщить о нём на @cofob."
+                f"Произошла ошибка. Попробуйте позже. Код ошибки {exception_id}, можете сообщить о нём на @egor_aeza."
             )
 
 

@@ -1,12 +1,14 @@
 from asyncio import sleep
 
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
 from ..keyboards.subscribe import SubscribeKeyboard
 from ..models.chat import ChatModel
 from ..texts import Texts
-from .router import router
+
+router = Router()
 
 
 @router.message(Command("start"))
