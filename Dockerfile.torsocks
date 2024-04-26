@@ -9,8 +9,6 @@ RUN poetry export -f requirements.txt -o /requirements.txt
 FROM scratch as source
 
 WORKDIR /
-COPY alembic.ini /alembic.ini
-COPY migrations /migrations
 COPY aeza_assistant /aeza_assistant
 
 
