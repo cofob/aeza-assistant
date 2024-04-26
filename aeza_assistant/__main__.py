@@ -1,10 +1,12 @@
 """Main entry point for the bot."""
 
-from asyncio import get_event_loop, sleep
+from asyncio import run, sleep
 from json import loads
 from logging import basicConfig
-from os import environ
+from os import chdir, environ, getcwd, path
 from sys import argv, exit
+from alembic.config import Config
+from alembic.command import upgrade
 
 from aiohttp import ClientSession
 
@@ -61,8 +63,16 @@ async def main_async() -> None:
 
 def main() -> None:
     """Run the bot."""
-    loop = get_event_loop()
-    loop.run_until_complete(main_async())
+    if argv[1] == "migrate":
+        lib_dir = path.dirname(path.abspath(__file__))
+        alembic_ini_path = path.join(lib_dir, "alembic.ini")
+        config = Config(alembic_ini_path)
+        cwd = getcwd()
+        chdir(lib_dir)
+        upgrade(config, "head")  # type: ignore[no-untyped-call]
+        chdir(cwd)
+    else:
+        run(main_async())
 
 
 if __name__ == "__main__":

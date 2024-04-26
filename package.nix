@@ -14,7 +14,7 @@ python3.pkgs.buildPythonPackage rec {
     poetry-core
   ];
 
-  alembic = python3Packages.alembic;
+  preBuild = ''sed -i "s@script_location = migrations@script_location = $out/${python3.sitePackages}/aeza_assistant/migrations@g" ./aeza_assistant/alembic.ini'';
 
   propagatedBuildInputs = with python3Packages; [
     aiogram
