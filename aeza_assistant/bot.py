@@ -19,8 +19,8 @@ from .middlewares import (
     DatabaseMiddleware,
     ErrorHandlerMiddleware,
 )
-from .task_queue import TaskQueue
 from .state import BotState
+from .task_queue import TaskQueue
 
 logger = getLogger(__name__)
 

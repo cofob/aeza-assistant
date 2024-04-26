@@ -5,10 +5,10 @@ from json import loads
 from logging import basicConfig
 from os import chdir, environ, getcwd, path
 from sys import argv, exit
-from alembic.config import Config
-from alembic.command import upgrade
 
 from aiohttp import ClientSession
+from alembic.command import upgrade
+from alembic.config import Config
 
 from .bot import BotFabric
 
@@ -69,7 +69,7 @@ def main() -> None:
         config = Config(alembic_ini_path)
         cwd = getcwd()
         chdir(lib_dir)
-        upgrade(config, "head")  # type: ignore[no-untyped-call]
+        upgrade(config, "head")
         chdir(cwd)
     else:
         run(main_async())
