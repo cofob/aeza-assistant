@@ -14,6 +14,8 @@ python3.pkgs.buildPythonPackage rec {
     poetry-core
   ];
 
+  alembic = python3Packages.alembic;
+
   propagatedBuildInputs = with python3Packages; [
     aiogram
     aiohttp

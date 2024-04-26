@@ -37,6 +37,7 @@ in
         User = "aeza-assistant";
         Group = "aeza-assistant";
         WorkingDirectory = cfg.datadir;
+        ExecStartPre = "${cfg.package.alembic}/bin/alembic upgrade head";
         ExecStart = "${cfg.package}/bin/aeza-assistant run";
         Restart = "on-failure";
         RestartSec = "1s";
