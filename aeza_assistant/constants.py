@@ -23,6 +23,7 @@ TARIFF_GROUPS = {
     205: "THR",
     960: "IC9",
     200: "IC14",
+    249: "NAS-4",
 }
 
 SORTED_GROUPS = [
@@ -49,5 +50,6 @@ SORTED_GROUPS = [
     "THR",
     "IC9",
     "IC14",
+    "NAS-4",
     "SWE-PROMO",
 ]
