@@ -41,7 +41,11 @@ async def subscribed_chat_iterator(
 
 
 async def send_notification_message(
-    bot: Bot, chat_id: int, text: str, photo: str | None = None
+    bot: Bot,
+    chat_id: int,
+    text: str,
+    photo: str | None = None,
+    message_thread_id: int | None = None,
 ) -> None:
     """Send a notification message to the chat."""
     logger.debug(f"Sending notification to {chat_id}")
@@ -52,9 +56,16 @@ async def send_notification_message(
             break
         try:
             if not photo:
-                await bot.send_message(chat_id, text, disable_web_page_preview=True)
+                await bot.send_message(
+                    chat_id,
+                    text,
+                    disable_web_page_preview=True,
+                    message_thread_id=message_thread_id,
+                )
             else:
-                await bot.send_photo(chat_id, photo, caption=text)
+                await bot.send_photo(
+                    chat_id, photo, caption=text, message_thread_id=message_thread_id
+                )
         except TelegramRetryAfter as e:
             logger.info(
                 f"Failed to send notification to {chat_id}, retrying in {e.retry_after} seconds"

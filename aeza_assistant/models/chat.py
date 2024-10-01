@@ -18,3 +18,5 @@ class ChatModel(AbstractModel):
     """Is the chat an admin?"""
     priority: int = Column(SmallInteger, default=0, nullable=False)
     """Chat send priority."""
+    forum_thread_id: int | None = Column(BigInteger, nullable=True)
+    """Forum thread ID to send notifications to."""

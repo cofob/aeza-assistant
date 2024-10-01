@@ -153,7 +153,13 @@ async def broadcast(
 
     async for chat in subscribed_chat_iterator(db):
         await queue.put(
-            send_notification_message(bot, chat.telegram_id, text, photo=photo)
+            send_notification_message(
+                bot,
+                chat.telegram_id,
+                text,
+                photo=photo,
+                message_thread_id=chat.forum_thread_id,
+            )
         )
 
 

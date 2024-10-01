@@ -4,6 +4,7 @@ from aiogram import Router
 
 from .added_to_group import router as added_to_group_router
 from .admin import router as admin_router
+from .forum import router as forum_router
 from .start import router as start_router
 from .status import router as status_router
 from .subscribe_callbacks import router as subscribe_callbacks_router
@@ -16,5 +17,6 @@ router.include_routers(
     admin_router,
     start_router,
     status_router,
+    forum_router,
     subscribe_callbacks_router,
 )

@@ -69,7 +69,12 @@ class Cron:
         i = 0
         async for chat in subscribed_chat_iterator(session):
             await self.queue.put(
-                send_notification_message(self.bot, chat.telegram_id, text)
+                send_notification_message(
+                    self.bot,
+                    chat.telegram_id,
+                    text,
+                    message_thread_id=chat.forum_thread_id,
+                )
             )
         logger.info(f"Sent notification to approx ~{i} chats")
 
