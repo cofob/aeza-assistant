@@ -1,6 +1,8 @@
 TARIFF_GROUPS = {
     148: "MSK",
     153: "MSKs",
+    259: "SPB",
+    264: "SPBs",
     138: "PAR",
     143: "PARs",
     42: "SWE-PROMO",
@@ -29,6 +31,8 @@ SORTED_GROUPS = [
     "ALBs",
     "MSK",
     "MSKs",
+    "SPB",
+    "SPBs",
     "PAR",
     "PARs",
     "VIE",
