@@ -146,8 +146,11 @@ async def broadcast(
         return
 
     photo = None
+    video = None
     if message.photo:
         photo = message.photo[-1].file_id
+    elif message.video:
+        video = message.video.file_id
 
     text = text[len("/broadcast ") :]
 
@@ -158,6 +161,7 @@ async def broadcast(
                 chat.telegram_id,
                 text,
                 photo=photo,
+                video=video,
                 message_thread_id=chat.forum_thread_id,
             )
         )
